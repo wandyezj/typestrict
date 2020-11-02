@@ -1,0 +1,39 @@
+{
+  "name": "typestrict",
+  "version": "0.0.0",
+  "description": "TypeStrict",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "test": "jest",
+    "prettier": "./node_modules/.bin/prettier --config .prettierrc.json --write src/**/*.ts",
+    "clean": "if exist dist (rmdir /s /q dist)",
+    "manual": "./node_modules/.bin/ts-node ./src/index.ts",
+    "test-manual": "./node_modules/.bin/ts-node ./test/manual.ts",
+    "build": "./node_modules/.bin/tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wandyezj/typestrict.git"
+  },
+  "author": "wandyezj",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/wandyezj/typestrict/issues"
+  },
+  "homepage": "https://github.com/wandyezj/typestrict#readme",
+  "dependencies": {
+    "typescript": "4.0.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.5",
+    "jest": "^26.6.1",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.3",
+    "ts-node": "^9.0.0"
+  }
+}
