@@ -1,0 +1,15 @@
+{
+    "name": "Test",
+    "description": "For narrowing down to specific cases",
+    "options": {
+        "rules": {
+            "blockRequired":{}
+        }
+    },
+    "cases":[
+        {
+            "pass": true,
+            "code": ""
+        }
+    ]
+}

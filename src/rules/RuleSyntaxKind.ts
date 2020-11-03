@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { Rule } from "./Rule";
+import { RuleResult } from "./RuleResult";
 
 export class RuleSyntaxKind implements Rule {
     constructor(private kinds: Set<ts.SyntaxKind>) {}

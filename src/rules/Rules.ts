@@ -2,6 +2,7 @@ import ts from "typescript";
 import { Rule } from "./Rule";
 import { RuleBlockRequired } from "./RuleBlockRequired";
 import { RuleSyntaxKind } from "./RuleSyntaxKind";
+import {RuleResult} from "./RuleResult";
 
 /**
  * contains all of the rules that are registered to run

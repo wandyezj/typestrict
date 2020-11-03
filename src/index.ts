@@ -38,7 +38,7 @@ const syntaxKindDefault = [
 ];
 
 export function checkTs(
-    typescript: string,
+    code: string,
     options: {
         rules?: {
             syntaxKind?: {};
@@ -46,7 +46,7 @@ export function checkTs(
         };
     } = {}
 ): boolean {
-
+    // console.log(code);
     const rules = new Rules();
 
     const enableSyntaxKind = options?.rules?.syntaxKind !== undefined;
@@ -56,11 +56,12 @@ export function checkTs(
 
     const enableBlockRequired = options?.rules?.blockRequired !== undefined;
     if (enableBlockRequired) {
+        // console.log("enableBlockRequired")
         rules.addRuleBlockRequired();
     }
 
     // if acting on a single source file then external symbols cannot be resolved
-    const sourceFile = getSourceFileNode(typescript);
+    const sourceFile = getSourceFileNode(code);
 
     visitNodesAndCallback(sourceFile, (node: ts.Node) => {
         rules.run(node);
@@ -72,37 +73,19 @@ export function checkTs(
     });
 
     return rules.pass;
-
-    // set of checks for a node, checks pass or fail.
-    return false;
 }
 
-// interface Check {
-//     check(node: ts.Node): void;
+// function test() {
+// const program = `
+// while(true);
+// `;
+// const pass = checkTs(program, {
+//     rules: {
+//         blockRequired: {},
+//         syntaxKind: {},
+//     },
+// });
 
+// console.log(pass);
 // }
-
-// function nodeOnlyContainsSupportedSyntaxKinds(node: ts.Node, kinds: Set<ts.SyntaxKind>): boolean {
-
-//     let allValid = true;
-
-//     function visitNode(node:ts.Node) {
-//         if (node) {
-//             const isValid = kinds.has(node.kind);
-//             allValid = allValid && isValid;
-//             console.log(`[${isValid ? " " : "X"}] ${ts.SyntaxKind[node.kind]}`);
-//             console.log(`node: ${node.getText()}`);
-
-//             ts.forEachChild(node, visitNode);
-//         }
-//     }
-
-//     visitNode(node);
-
-//     return allValid;
-// }
-
-const program = `
-const x = 0;
-`;
-checkTs(program);
+// test();

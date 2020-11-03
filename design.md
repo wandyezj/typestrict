@@ -19,8 +19,9 @@
 
 - no var
 
-
+```json
     {
         "pass": false,
         "code": "var x = 'value'"
     }
+```

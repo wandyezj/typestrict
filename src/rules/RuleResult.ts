@@ -1,4 +1,4 @@
-interface RuleResult {
+export interface RuleResult {
     /**
      * Is the rule relevant for this node?
      */

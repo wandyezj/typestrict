@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { Rule } from "./Rule";
+import { RuleResult } from "./RuleResult";
 
 export class RuleBlockRequired implements Rule {
     constructor() {}
@@ -16,6 +17,7 @@ export class RuleBlockRequired implements Rule {
             const thenIsBlock = ts.isBlock(thenStatement);
             const elseIsIf =
                 elseStatement === undefined || ts.isIfStatement(elseStatement);
+            relevant = true;
             pass = thenIsBlock && elseIsIf;
         } else if (
             ts.isForStatement(node) ||
@@ -23,6 +25,7 @@ export class RuleBlockRequired implements Rule {
             ts.isForOfStatement(node) ||
             ts.isWhileStatement(node)
         ) {
+            relevant = true;
             const statement = (node as
                 | ts.ForStatement
                 | ts.ForInStatement
