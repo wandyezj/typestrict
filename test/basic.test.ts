@@ -9,40 +9,23 @@ More Rules
 
 */
 
-test("basic", () => {
-    console.log("basic");
+import {allCaseJson, checkTs} from "./external";
+
+
+describe("basic", () => {
+
+    allCaseJson.forEach(({name, options,cases}, index) => {
+        describe(name || `[${index}]`, () => {
+            cases.forEach(({name, code, pass}, index) => {
+
+                test(name || `[${index}] ${code}`, () => {
+                    const actualPass = checkTs(code, options);
+                    expect(actualPass).toBe(pass);
+                });
+        
+            });
+        })
+
+    });
+
 });
-
-// should also enable rules to enable for the case
-
-// really want to discover the syntax kind set for each example
-// describe syntax allowable and then ban everything else
-const cases: {name?: string, pass: boolean, code: string}[] = [
-{
-    pass: true,
-code:`
-const x = 0'
-`
-},
-{
-    pass: true,
-code:`
-let x = "value"
-`,
-}
-,
-{
-    pass: false,
-code:`
-var x = "value"
-`,
-}
-,
-{
-    pass: true,
-code:`
-let x = "value"
-`,
-}
-
-]

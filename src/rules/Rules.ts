@@ -1,11 +1,16 @@
 import ts from "typescript";
-import { Rule } from "../Rule";
+import { Rule } from "./Rule";
+import { RuleBlockRequired } from "./RuleBlockRequired";
 import { RuleSyntaxKind } from "./RuleSyntaxKind";
 
 /**
  * contains all of the rules that are registered to run
  */
 export class Rules implements Rule {
+    readonly name = "RuleRegistry";
+
+    readonly description = `Aggregation of multiple rules`;
+
     readonly errors: string[] = [];
     private rules: Rule[] = [];
 
@@ -15,13 +20,19 @@ export class Rules implements Rule {
 
     constructor() {}
 
+    private addRule(rule: Rule) {
+        this.rules.push(rule);
+    }
     // Add all the rules
     addRuleSyntaxKind(kinds: ts.SyntaxKind[]) {
         const rule = new RuleSyntaxKind(new Set<ts.SyntaxKind>(kinds));
-        this.rules.push(rule);
+        this.addRule(rule);
     }
 
-    readonly name = "RuleRegistry";
+    addRuleBlockRequired() {
+        const rule = new RuleBlockRequired();
+        this.addRule(rule);
+    }
 
     run(node: ts.Node) {
         // want to know for each node which rules failed and why
@@ -41,7 +52,9 @@ export class Rules implements Rule {
 
         const message = pass
             ? undefined
-            : `node: ${node.getText()}\n${results.join("\n")}`;
+            : `node: [${node.pos}, ${
+                  node.end
+              }] ${node.getText()}\n${results.join("\n")}`;
 
         if (message) {
             this.errors.push(message);

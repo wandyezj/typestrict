@@ -1,11 +1,27 @@
-import {cases, syntaxKinds} from "./external"
+import {ruleExamples, syntaxKinds, uniqueList} from "./external"
 
 console.log("test");
 
-cases.forEach((example) => {
-    const {code} = example;
+
+const allowableKinds: string[] = [];
+
+ruleExamples.cases.forEach((example) => {
+    const {code, pass} = example;
 
     const kinds = syntaxKinds(code);
-    console.log(code);
-    console.log(kinds.join("\n"))
+
+    if (pass) {
+        allowableKinds.push(...kinds);
+    }
+
+    console.log(`${code}
+${kinds.join("\n")}
+    `);
 });
+
+
+console.log("\n\nRequired Kinds\n")
+const uniqueKinds = uniqueList(allowableKinds);
+console.log(uniqueKinds.map(name => 
+    `ts.SyntaxKind.${name},`).join("\n"));
+

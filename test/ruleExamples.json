@@ -1,0 +1,59 @@
+{
+"name": "Normal Passing Examples",
+"options": {
+    "rules": {
+        "syntaxKind":{},
+        "blockRequired":{}
+    }
+},
+"cases":[
+    {
+        "pass": true,
+        "code": "const x = 0"
+    },
+    {
+        "pass": true,
+        "code": "let x = 'value'"
+    },
+    {
+        "pass": true,
+        "code": "let x = 'value'"
+    },
+    {
+        "pass": true,
+        "code": "for (let i =0; i < 3; i++) {}"
+    },
+    {
+        "pass": true,
+        "code": "while(true){}"
+    },
+    {
+        "pass": true,
+        "code": "if(false){}"
+    },
+    {
+        "pass": true,
+        "code": "function f(){}"
+    },
+    {
+        "pass": true,
+        "code": "const list = [0,1,2]"
+    },
+    {
+        "pass": true,
+        "code": "for (let item of 'abc'){}"
+    },
+    {
+        "pass": true,
+        "code": "for (let item in {a:1, b:2, c:3}){}"
+    },
+    {
+        "pass": true,
+        "code": "const f = (n: number) => n +1; console.log(f(1));"
+    },
+    {
+        "pass": true,
+        "code": ""
+    }
+]
+}

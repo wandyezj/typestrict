@@ -1,0 +1,22 @@
+{
+    "name": "RuleBlockRequired",
+    "options": {
+        "rules": {
+            "blockRequired":{}
+        }
+    },
+    "cases":[
+        {
+            "pass": false,
+            "code": "if(false);"
+        },
+        {
+            "pass": false,
+            "code": "let x = 0; if(false) {} else x = 1;"
+        },
+        {
+            "pass": false,
+            "code": "while(true);"
+        }
+    ]
+}
