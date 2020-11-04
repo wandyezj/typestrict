@@ -1,0 +1,35 @@
+{
+    "name": "RuleNameRegex",
+    "description": "test rules related to naming of identifiers",
+    "options": {
+        "rules": {
+            "nameRegex":{}
+        }
+    },
+    "cases":[
+        {
+            "pass": true,
+            "code": "function name(){};"
+        },
+        {
+            "pass": true,
+            "code": "function nameName(){};"
+        },
+        {
+            "pass": false,
+            "code": "function Name(){};"
+        },
+        {
+            "pass": false,
+            "code": "function NameName(){};"
+        },
+        {
+            "pass": false,
+            "code": "function aBBa(){};"
+        },
+        {
+            "pass": false,
+            "code": "function abBA(){};"
+        }
+    ]
+}

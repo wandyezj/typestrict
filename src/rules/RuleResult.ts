@@ -1,17 +1,6 @@
-export interface RuleResult {
-    /**
-     * Is the rule relevant for this node?
-     */
-    relevant: boolean;
+import ts from "typescript";
 
-    /**
-     * did the rule pass?
-     * if the rule is not relevant then the rule should pass
-     */
-    pass: boolean;
-
-    /**
-     * message
-     */
-    message?: string;
-}
+/**
+ * Result from a rule
+ */
+export interface RuleResult {node: ts.Node, issue: string};

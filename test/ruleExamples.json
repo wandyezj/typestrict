@@ -3,7 +3,8 @@
 "options": {
     "rules": {
         "syntaxKind":{},
-        "blockRequired":{}
+        "blockRequired":{},
+        "enableNameRegex":{}
     }
 },
 "cases":[

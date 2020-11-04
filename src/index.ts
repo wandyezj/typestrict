@@ -43,6 +43,7 @@ export function checkTs(
         rules?: {
             syntaxKind?: {};
             blockRequired?: {};
+            nameRegex?:{};
         };
     } = {}
 ): boolean {
@@ -59,6 +60,24 @@ export function checkTs(
         // console.log("enableBlockRequired")
         rules.addRuleBlockRequired();
     }
+
+    const enableNameRegex = options?.rules?.nameRegex !== undefined;
+    if (enableNameRegex) {
+        // console.log("enableNameRegex")
+
+        /*
+        Function Names must:
+            - be composed only ov upper and lower case ASCII letters
+            - start with a lower case letter
+            - end with a lower case letter
+            - not have upper case letters next to each other
+        */
+        const functionName = /^[a-z]+([A-Z]{1}[a-z]+)*$/;
+        rules.addRuleNameRegex({
+            functionName 
+        });
+    }
+
 
     // if acting on a single source file then external symbols cannot be resolved
     const sourceFile = getSourceFileNode(code);

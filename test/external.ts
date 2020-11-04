@@ -13,9 +13,11 @@ export {checkTs} from "../src/index";
 export const ruleTest: CaseJson = require("./ruleTest.json");
 export const ruleExamples: CaseJson = require("./ruleExamples.json");
 export const ruleBlockRequired: CaseJson = require("./ruleBlockRequired.json");
+export const ruleNameRegex: CaseJson = require("./ruleNameRegex.json");
 
 export const allCaseJson: CaseJson[] = [
     ruleTest,
     ruleExamples,
     ruleBlockRequired,
+    ruleNameRegex,
 ];

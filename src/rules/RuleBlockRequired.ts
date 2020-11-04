@@ -9,40 +9,49 @@ export class RuleBlockRequired implements Rule {
 
     readonly description = `Require blocks on all loops and if else statements`;
 
-    run(node: ts.Node): RuleResult {
-        let relevant = false;
-        let pass = true;
+    run(node: ts.Node): RuleResult[] {
+        const result: RuleResult[] = [];
+
         if (ts.isIfStatement(node)) {
             const { thenStatement, elseStatement } = node as ts.IfStatement;
             const thenIsBlock = ts.isBlock(thenStatement);
             const elseIsIf =
                 elseStatement === undefined || ts.isIfStatement(elseStatement);
-            relevant = true;
-            pass = thenIsBlock && elseIsIf;
+
+            if (!thenIsBlock) {
+                result.push({
+                    node,
+                    issue: `${this.name} If Statements must have blocks`
+                });
+            }
+
+            if (!elseIsIf) {
+                result.push({
+                    node: node,
+                    issue: `${this.name} Else Statements must have blocks`
+                });
+            }
+
         } else if (
             ts.isForStatement(node) ||
             ts.isForInStatement(node) ||
             ts.isForOfStatement(node) ||
             ts.isWhileStatement(node)
         ) {
-            relevant = true;
             const statement = (node as
                 | ts.ForStatement
                 | ts.ForInStatement
                 | ts.ForOfStatement
                 | ts.WhileStatement).statement;
-            pass = ts.isBlock(statement);
+            const hasBlock = ts.isBlock(statement);
+
+            if (!hasBlock) {
+                result.push({
+                    node: node,
+                    issue: `${this.name} Loops must have blocks`
+                });
+            }
         }
-
-        const message = pass
-            ? undefined
-            : `Block Required on ${ts.SyntaxKind[node.kind]}`;
-
-        const result: RuleResult = {
-            relevant,
-            pass,
-            message,
-        };
 
         return result;
     }

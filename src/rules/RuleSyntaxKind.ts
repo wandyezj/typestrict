@@ -9,18 +9,13 @@ export class RuleSyntaxKind implements Rule {
 
     readonly description = `Allow only specified SyntaxKinds`;
 
-    run(node: ts.Node): RuleResult {
-        const relevant = true;
+    run(node: ts.Node): RuleResult[] {
         const pass = this.kinds.has(node.kind);
-        const message = pass
-            ? undefined
-            : `Unsupported SyntaxKind ${ts.SyntaxKind[node.kind]}`;
 
-        const result: RuleResult = {
-            relevant,
-            pass,
-            message,
-        };
+        const result: RuleResult[] = pass? [] :[{
+            node,
+            issue: `Unsupported SyntaxKind ${ts.SyntaxKind[node.kind]}`,
+        }];
 
         return result;
     }
