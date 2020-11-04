@@ -36,7 +36,7 @@ export class Rules implements Rule {
         this.addRule(rule);
     }
 
-    addRuleNameRegex(options: {functionName: RegExp}) {
+    addRuleNameRegex(options: {functionName: RegExp, variableName: RegExp}) {
         const rule = new RuleNameRegex(options);
         this.addRule(rule);
     }

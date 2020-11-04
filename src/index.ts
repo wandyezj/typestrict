@@ -73,8 +73,10 @@ export function checkTs(
             - not have upper case letters next to each other
         */
         const functionName = /^[a-z]+([A-Z]{1}[a-z]+)*$/;
+        const variableName = functionName;
         rules.addRuleNameRegex({
-            functionName 
+            functionName,
+            variableName,
         });
     }
 
@@ -94,17 +96,18 @@ export function checkTs(
     return rules.pass;
 }
 
-// function test() {
-// const program = `
-// while(true);
-// `;
-// const pass = checkTs(program, {
-//     rules: {
-//         blockRequired: {},
-//         syntaxKind: {},
-//     },
-// });
+function test() {
+const program = `
+let X = 5
+`;
+const pass = checkTs(program, {
+    rules: {
+        blockRequired: {},
+        syntaxKind: {},
+        nameRegex:{},
+    },
+});
 
-// console.log(pass);
-// }
-// test();
+console.log(pass);
+}
+test();

@@ -14,7 +14,7 @@ export class RuleSyntaxKind implements Rule {
 
         const result: RuleResult[] = pass? [] :[{
             node,
-            issue: `Unsupported SyntaxKind ${ts.SyntaxKind[node.kind]}`,
+            issue: `${this.name} Unsupported SyntaxKind ${ts.SyntaxKind[node.kind]}`,
         }];
 
         return result;

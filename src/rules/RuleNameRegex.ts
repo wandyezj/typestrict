@@ -4,9 +4,12 @@ import { RuleResult } from "./RuleResult";
 
 export class RuleNameRegex implements Rule {
     readonly functionName: RegExp | undefined;
-    constructor(options: {functionName?: RegExp}) {
-        const {functionName} = options;
+    readonly variableName: RegExp | undefined;
+
+    constructor(options: {functionName?: RegExp, variableName?: RegExp}) {
+        const {functionName, variableName} = options;
         this.functionName = functionName;
+        this.variableName = variableName;
     }
 
     readonly name = "RuleNameRegex";
@@ -29,13 +32,31 @@ export class RuleNameRegex implements Rule {
                     issue: `${this.name} Invalid Function Name`,
                 });
             }
+        } else if (this.variableName && ts.isVariableStatement(node)) {
+
+            const {declarationList} = node as ts.VariableStatement;
+            declarationList.forEachChild((node: ts.Node) => {
+                if (ts.isVariableDeclaration(node)) {
+                    const variable = node as ts.VariableDeclaration;
+                    const identifier = variable.name;
+                    if (ts.isIdentifier(identifier)) {
+                        const pass = testIdentifier(identifier, this.variableName);
+                        if (!pass) {
+                            result.push({
+                                node,
+                                issue: `${this.name} Invalid Variable Name`,
+                            });
+                        }
+                    }
+                }
+            });
         }
 
         return result;
     }
 }
 
-function testIdentifier(identifier: ts.Identifier | undefined, regex: RegExp): boolean {
-    const pass = identifier !== undefined && regex.test(identifier.text);
+function testIdentifier(identifier: ts.Identifier | undefined, regex: RegExp | undefined): boolean {
+    const pass = identifier !== undefined && regex !== undefined && regex.test(identifier.text);
     return pass;
 }

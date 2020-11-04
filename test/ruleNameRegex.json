@@ -30,6 +30,18 @@
         {
             "pass": false,
             "code": "function abBA(){};"
+        },
+        {
+            "pass": true,
+            "code": "let x = 5;"
+        },
+        {
+            "pass": true,
+            "code": "let aaa = 5;"
+        },
+        {
+            "pass": false,
+            "code": "let X = 5;"
         }
     ]
 }
