@@ -26,7 +26,7 @@ export function createProgram(
     // fake compiler host
     const compilerHost: ts.CompilerHost = {
         getSourceFile: (fileName: string) => {
-            console.log(fileName);
+            //console.log(fileName);
             //.replace(/\\/g, "/")
             // lib.d.ts
             return fileName === inputFileName ? sourceFile : undefined;

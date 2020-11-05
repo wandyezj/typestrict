@@ -1,0 +1,23 @@
+{
+    "name": "FunctionDeclaration",
+    "description": "check that functions can only be declared at the top level scope",
+    "options": {
+        "rules": {
+            "functionDeclaration":{}
+        }
+    },
+    "cases":[
+        {
+            "pass": true,
+            "code": "function f(){}"
+        },
+        {
+            "pass": true,
+            "code": "function a(){} function b(){}"
+        },
+        {
+            "pass": false,
+            "code": "function f(){function f(){}}"
+        }
+    ]
+}

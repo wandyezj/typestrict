@@ -20,11 +20,7 @@ export class RuleNameRegex implements Rule {
         const result: RuleResult[] = [];
 
         if (this.functionName && ts.isFunctionDeclaration(node)) {
-            const {name, parent} = node as ts.FunctionDeclaration;
-            
-            if (parent === node) {
-                console.log("parent");
-            }
+            const {name} = node as ts.FunctionDeclaration;
             const pass = testIdentifier(name, this.functionName);
             if (!pass) {
                 result.push({

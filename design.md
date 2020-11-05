@@ -5,6 +5,12 @@
 - simple uniform language
 - designed for simple scripts, not complex programming tasks
 
+## Theory
+
+- A uniform set of standard guidelines and practices for language features will add value to small scripts and it makes it easier to swap components between them
+- Allows other people to easily understand a set of scripts
+- removes surprises for unexpected uses of features
+
 ## Architecture
 
 - want to be able to attach a specific issue message to a specific node
@@ -18,13 +24,15 @@
 
 - while, for, and if statements should required an associated block. This is to prevent common mistakes when writing code and when modifying subsequent code. This also needs to apply to else statements, except these may also have an if statement
 
+- names are composed of only lower and upper case letters
+
 - no any
 
 - for in should only be used on objects, for of should be used on strings and arrays.
 
 - no functions declared inside of functions
 
-- names are composed of only lower and upper case letters
+- single declaration
 
 - no var
 
@@ -34,6 +42,8 @@
 - no operations on invalid types (avoid type coercion)
 
 - access of variables declared outside of function scope
+
+- lambdas can not be assigned to variables only used to pass to functions
 
 ```json
     {

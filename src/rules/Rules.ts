@@ -4,6 +4,7 @@ import { RuleBlockRequired } from "./RuleBlockRequired";
 import { RuleSyntaxKind } from "./RuleSyntaxKind";
 import {RuleResult} from "./RuleResult";
 import { RuleNameRegex } from "./RuleNameRegex";
+import { RuleFunctionDeclaration } from "./RuleFunctionDeclaration";
 
 /**
  * contains all of the rules that are registered to run
@@ -38,6 +39,11 @@ export class Rules implements Rule {
 
     addRuleNameRegex(options: {functionName: RegExp, variableName: RegExp}) {
         const rule = new RuleNameRegex(options);
+        this.addRule(rule);
+    }
+
+    addRuleFunctionDeclaration() {
+        const rule = new RuleFunctionDeclaration();
         this.addRule(rule);
     }
 

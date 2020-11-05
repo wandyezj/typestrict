@@ -40,11 +40,12 @@ const syntaxKindDefault = [
 export function checkTs(
     code: string,
     options: {
-        rules?: {
-            syntaxKind?: {};
-            blockRequired?: {};
-            nameRegex?:{};
-        };
+        rules?: Partial<{
+            syntaxKind: {};
+            blockRequired: {};
+            nameRegex:{};
+            functionDeclaration:{};
+        }>;
     } = {}
 ): boolean {
     // console.log(code);
@@ -80,6 +81,10 @@ export function checkTs(
         });
     }
 
+    const enableFunctionDeclaration = options?.rules?.functionDeclaration !== undefined;
+    if (enableFunctionDeclaration) {
+        rules.addRuleFunctionDeclaration();
+    }
 
     // if acting on a single source file then external symbols cannot be resolved
     const sourceFile = getSourceFileNode(code);
@@ -89,22 +94,23 @@ export function checkTs(
     });
 
     // print all the messages
-    rules.errors.forEach((error) => {
-        console.log(error);
-    });
+    // rules.errors.forEach((error) => {
+    //     console.log(error);
+    // });
 
     return rules.pass;
 }
 
 function test() {
 const program = `
-let X = 5
+function f(){function f(){}}
 `;
 const pass = checkTs(program, {
     rules: {
         blockRequired: {},
         syntaxKind: {},
         nameRegex:{},
+        functionDeclaration:{},
     },
 });
 
