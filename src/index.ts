@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import { getSourceFileNode } from "./getSourceFileNode";
 import { Rules } from "./rules/Rules";
 import { visitNodesAndCallback } from "./visitNodesAndCallback";
+import {Issue} from  "./Issue";
 
 const syntaxKindDefault = [
     ts.SyntaxKind.SourceFile,
@@ -37,32 +38,49 @@ const syntaxKindDefault = [
     ts.SyntaxKind.PropertyAccessExpression,
 ];
 
-export function checkTs(
-    code: string,
-    options: {
+export interface CheckOptions {
         rules?: Partial<{
             syntaxKind: {};
             blockRequired: {};
             nameRegex:{};
             functionDeclaration:{};
-        }>;
-    } = {}
-): boolean {
+        }>
+}
+
+
+export function getIssues(
+    code: string,
+    options: CheckOptions = {
+        rules: {
+            syntaxKind: {},
+            blockRequired: {},
+            nameRegex:{},
+            functionDeclaration:{},
+        }
+    }
+): Issue[] {
     // console.log(code);
     const rules = new Rules();
 
-    const enableSyntaxKind = options?.rules?.syntaxKind !== undefined;
+    const {
+        syntaxKind,
+        blockRequired,
+        nameRegex,
+        functionDeclaration
+    } = options.rules || {};
+
+    const enableSyntaxKind = syntaxKind !== undefined;
     if (enableSyntaxKind) {
         rules.addRuleSyntaxKind(syntaxKindDefault);
     }
 
-    const enableBlockRequired = options?.rules?.blockRequired !== undefined;
+    const enableBlockRequired = blockRequired !== undefined;
     if (enableBlockRequired) {
         // console.log("enableBlockRequired")
         rules.addRuleBlockRequired();
     }
 
-    const enableNameRegex = options?.rules?.nameRegex !== undefined;
+    const enableNameRegex = nameRegex !== undefined;
     if (enableNameRegex) {
         // console.log("enableNameRegex")
 
@@ -81,7 +99,7 @@ export function checkTs(
         });
     }
 
-    const enableFunctionDeclaration = options?.rules?.functionDeclaration !== undefined;
+    const enableFunctionDeclaration = functionDeclaration !== undefined;
     if (enableFunctionDeclaration) {
         rules.addRuleFunctionDeclaration();
     }
@@ -93,13 +111,48 @@ export function checkTs(
         rules.run(node);
     });
 
-    // print all the messages
+     // print all the messages
     // rules.errors.forEach((error) => {
     //     console.log(error);
     // });
 
-    return rules.pass;
+    const issues = rules.results.map((result) => {
+        const {code, message, node} = result;
+
+        const {pos, end}= node;
+
+        const open = sourceFile.getLineAndCharacterOfPosition(pos);
+        const close = sourceFile.getLineAndCharacterOfPosition(end);
+
+        const issue: Issue = {
+            code: code || "?",
+            message,
+            pos,
+            end,
+            startLineNumber: open.line,
+            endLineNumber: close.line,
+            startColumn: open.character,
+            endColumn: close.character,
+        };
+
+        return issue;
+    });
+
+    return issues;
 }
+
+export function checkTs(
+    code: string,
+    options: CheckOptions = {}
+): boolean {
+
+
+ 
+    const issues = getIssues(code, options);
+    return issues.length === 0;
+}
+
+
 
 function test() {
 const program = `

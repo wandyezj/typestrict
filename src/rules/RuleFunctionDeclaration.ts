@@ -28,8 +28,8 @@ export class RuleFunctionDeclaration implements Rule {
                     visitNodesAndCallback(declaration.body, (node: ts.Node)=> {
                         if (ts.isFunctionDeclaration(node)) {
                             result.push({
-                                node: node,
-                                issue: `${this.name} All functions must be declared at the top level`
+                                node,
+                                message: `${this.name} All functions must be declared at the top level`
                             });
                         }
                     });

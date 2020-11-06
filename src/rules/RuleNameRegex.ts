@@ -25,7 +25,7 @@ export class RuleNameRegex implements Rule {
             if (!pass) {
                 result.push({
                     node,
-                    issue: `${this.name} Invalid Function Name`,
+                    message: `${this.name} Invalid Function Name`,
                 });
             }
         } else if (this.variableName && ts.isVariableStatement(node)) {
@@ -40,7 +40,7 @@ export class RuleNameRegex implements Rule {
                         if (!pass) {
                             result.push({
                                 node,
-                                issue: `${this.name} Invalid Variable Name`,
+                                message: `${this.name} Invalid Variable Name`,
                             });
                         }
                     }

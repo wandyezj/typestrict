@@ -21,14 +21,14 @@ export class RuleBlockRequired implements Rule {
             if (!thenIsBlock) {
                 result.push({
                     node,
-                    issue: `${this.name} If Statements must have blocks`
+                    message: `${this.name} If Statements must have blocks`
                 });
             }
 
             if (!elseIsIf) {
                 result.push({
                     node: node,
-                    issue: `${this.name} Else Statements must have blocks`
+                    message: `${this.name} Else Statements must have blocks`
                 });
             }
 
@@ -48,7 +48,7 @@ export class RuleBlockRequired implements Rule {
             if (!hasBlock) {
                 result.push({
                     node: node,
-                    issue: `${this.name} Loops must have blocks`
+                    message: `${this.name} Loops must have blocks`
                 });
             }
         }

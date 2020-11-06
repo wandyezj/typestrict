@@ -15,6 +15,7 @@ export class Rules implements Rule {
     readonly description = `Aggregation of multiple rules`;
 
     readonly errors: string[] = [];
+    readonly results: RuleResult[] = [];
     private rules: Rule[] = [];
 
     get pass(): boolean {
@@ -54,22 +55,24 @@ export class Rules implements Rule {
     run(node: ts.Node) : RuleResult[]{
         // want to know for each node which rules failed and why
         // run all the rule on the node
-        const results = this.rules
-            .map((rule) => rule.run(node))
-            .filter((list) => list.length > 0)
-            .flat(1);
 
+        const results = this.rules.map((rule) =>  rule.run(node))
+        .filter((results) => results.length > 0)
+        //.flat(1);
+        .reduce((acc, val) => acc.concat(val), []);
+        
+        // this.results.push(...results);
+        results.forEach(result => {
+            this.results.push(result)
+        });
+        
         const formatNode = (node: ts.Node) => `node: [${node.pos}, ${node.end}] ${node.getText()}`;
-        const messages = results.map((result) => `${formatNode(node)}\n\t\t${result.issue}`);
+        const messages = results.map((result) => `${formatNode(node)}\n\t\t${result.message}`);
+        const message = `${formatNode(node)}\n\t${messages.join("\n\t")}`;
+        
+        //this.errors.push(...message);
+        this.errors.push(message);
 
-        this.errors.push(...messages);
-
-        const issue = `${formatNode(node)}\n\t${messages.join("\n\t")}`;
-        const result: RuleResult[] = messages.length === 0 ? [] : [{
-            node,
-            issue,
-        }];
-
-        return result;
+        return results;
     }
 }
