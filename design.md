@@ -11,6 +11,27 @@
 - Allows other people to easily understand a set of scripts
 - removes surprises for unexpected uses of features
 
+## Support
+
+- number
+- string
+- array
+- if
+- for
+    - iteration through a fixed set or boundary, is this needed with array functions and forEach? Possibly simpler than forEach and avoids nesting
+- functions
+    - only allowed to be called, not to be passed to callbacks
+- lambdas
+    - only allowed in context of a callbacks
+- fetch
+
+### Avoid
+
+- while
+    - iterates though a non fixed boundary, not needed for most scripting tasks, presents issue of an infinite loop
+
+
+
 ## Architecture
 
 - want to be able to attach a specific issue message to a specific node
