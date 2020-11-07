@@ -3,6 +3,7 @@ import { getSourceFileNode } from "./getSourceFileNode";
 import { Rules } from "./rules/Rules";
 import { visitNodesAndCallback } from "./visitNodesAndCallback";
 import {Issue} from  "./Issue";
+// import {createProgram} from "./createProgram";
 
 const syntaxKindDefault = [
     ts.SyntaxKind.SourceFile,
@@ -105,6 +106,11 @@ export function getIssues(
     }
 
     // if acting on a single source file then external symbols cannot be resolved
+    // const program = createProgram("file", code);
+    // const sourceFile =  program.getSourceFile("file");
+    // if (!sourceFile) {
+    //     return [];
+    // }
     const sourceFile = getSourceFileNode(code);
 
     visitNodesAndCallback(sourceFile, (node: ts.Node) => {
@@ -119,7 +125,7 @@ export function getIssues(
     const issues = rules.results.map((result) => {
         const {code, message, node} = result;
 
-        const {pos, end}= node;
+        const {pos, end} = node;
 
         const open = sourceFile.getLineAndCharacterOfPosition(pos);
         const close = sourceFile.getLineAndCharacterOfPosition(end);

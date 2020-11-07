@@ -12,6 +12,7 @@ export function createProgram(
     const compilerOptions: ts.CompilerOptions = {
         target: ts.ScriptTarget.ES5,
         sourceMap: true,
+        
     };
 
     // sourceFile and host

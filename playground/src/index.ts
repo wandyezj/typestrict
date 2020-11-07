@@ -60,6 +60,10 @@ function Invalid() {
 }
 
 
+class Blocked {
+	constructor() {}
+}
+
 
 `;
 
