@@ -38,7 +38,7 @@ module.exports = {
 	},
 	plugins: [
 		new HtmlWebPackPlugin({
-			title: 'Monaco Editor Sample'
+			template: "./src/index.html",
 		})
 	]
 };

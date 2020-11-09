@@ -1,7 +1,7 @@
-import * as monaco from 'monaco-editor';
-import './index.css';
 
-import {getIssues} from "../../src/index"
+import './index.css';
+import {editor} from "./editor";
+import * as ts from "typescript";
 
 // @ts-ignore
 self.MonacoEnvironment = {
@@ -22,108 +22,155 @@ self.MonacoEnvironment = {
 	}
 };
 
-const language = "typescript";
-const code = `function normal() {
-    console.log("Hello world!");
-}
+document.getElementById("run").onclick = run;
 
-// Good
-function outside() {
-	
-	// Bad - functions are not allowed in other functions
-	function inside() {
-
-	}
-}
-
-// Good
-if (true) {
-
-} else if (true) {
-
-} else {
-
-}
-
-// Bad - must have block
-if (true) console.log("if");
-
-if (true) {
-
-// Bad - else must have block
-} else console.log("else")
-
-
-// Bad - functions should start with a lowercase letter
-function Invalid() {
-
-}
-
-
-class Blocked {
-	constructor() {}
-}
-
-
-`;
-
-
-const editor = monaco.editor.create(document.body, {
-	value: code,
-	language,
-});
-
-// initial lint run
-//runLinter();
-
-//const uri = monaco.Uri.file("test");
-const model = editor.getModel();
-
-// seems like this could be simpler
-function debounce(callback: () => void, delayMilliseconds: number) {
-	let timer;
-	return function () {
-		const context = this;
-		const args = arguments;
-		clearTimeout(timer);
-		timer = setTimeout(() => callback.apply(context, args), delayMilliseconds);
-	}
-}
-
-const linterDelayMilliseconds = 1000;
-model.onDidChangeContent(debounce(() => {
-runLinter();
-}, linterDelayMilliseconds));
-
-
-function runLinter() {
-	const owner = "test";
-
-
-	// const marker: monaco.editor.IMarkerData = {
-	// 	code:"code",
-	// 	message: "message",
-	// 	severity: monaco.MarkerSeverity.Error,
-	// 	startLineNumber:1,
-	// 	endLineNumber: 1,
-	// 	startColumn: 1,
-	// 	endColumn: 4,
-	// }
+function run() {
 	const code = editor.getValue();
+	console.log("Run");
+	console.log(code);
 
-	const markers: monaco.editor.IMarkerData[] = getMarkers(code);
-	// [marker];
-	monaco.editor.setModelMarkers(model, owner, markers);
+	// needs to end in appropriate extension
+	const fileName = "run"
+	const sourceFileName = `${fileName}.ts`;
+	const compiledFileName = `${fileName}.js`;
+	const program = createProgram(sourceFileName, code);
+
+	let compiledCode = "";
+	const result = program.emit(undefined, (fileName, data) => {
+		if (fileName === compiledFileName) {
+			//console.log(fileName);
+			//console.log(data);
+			compiledCode = data;
+		}
+	}, undefined, false, {before:[createTsToTsTransform]});
+
+	//const a: ts.CustomTransformers
+	//console.log(result.emittedFiles);
+	//console.log(compiledCode);
+
+	eval(compiledCode);
+
+	// now compile and execute
 }
 
-function getMarkers(code: string) {
-	const issues = getIssues(code);
-	const markers: monaco.editor.IMarkerData[] = issues.map((issue) => {
-		return {
-			...issue,
-			severity: monaco.MarkerSeverity.Error,
-		}
-	});
 
-	return markers;
+
+export function createProgram(
+    inputFileName: string,
+    typescriptInput: string
+): ts.Program {
+    // outputs
+    // let outputText: string | undefined;
+    // let sourceMapText: string | undefined;
+
+    // options
+    const compilerOptions: ts.CompilerOptions = {
+        target: ts.ScriptTarget.ES2020,
+		sourceMap: true,
+		inlineSourceMap: true,
+		inlineSources: true,
+    };
+
+    // sourceFile and host
+    // need to set parent nodes
+    const sourceFile = ts.createSourceFile(
+        inputFileName,
+        typescriptInput,
+        ts.ScriptTarget.ESNext,
+        true
+    );
+
+    // fake compiler host
+    const compilerHost: ts.CompilerHost = {
+        getSourceFile: (fileName: string) => {
+            //console.log(fileName);
+            //.replace(/\\/g, "/")
+            // lib.d.ts
+            return fileName === inputFileName ? sourceFile : undefined;
+        },
+        writeFile: () => {},
+        // (name, text) => {
+        //     if (/\.map$/.test(name)) {
+        //         sourceMapText = text;
+        //     }
+        //     else {
+        //         outputText = text;
+        //     }
+        // },
+        getDefaultLibFileName: () => "lib.d.ts",
+        useCaseSensitiveFileNames: () => false,
+        getCanonicalFileName: (fileName) => fileName,
+        getCurrentDirectory: () => "",
+        getNewLine: () => "\n",
+        fileExists: (fileName): boolean => fileName === inputFileName,
+        readFile: () => "",
+        directoryExists: () => true,
+        getDirectories: () => [],
+    };
+
+    // construct the program
+    const program = ts.createProgram(
+        [inputFileName],
+        compilerOptions,
+        compilerHost
+    );
+
+    return program;
+}
+
+
+
+function createTsToTsTransform(context: ts.TransformationContext): (file: ts.SourceFile) => ts.SourceFile {
+    const { factory } = context;
+
+
+	function createConsoleLog() {
+		const message = "start"
+		return factory.createExpressionStatement(factory.createCallExpression(
+			  factory.createPropertyAccessExpression(
+				factory.createIdentifier("console"),
+				factory.createIdentifier("log")
+			  ),
+			  undefined,
+			  [factory.createStringLiteral(message)]
+			));
+	}
+
+	// replace sort with reverse
+    function visitor(node: ts.Node): ts.VisitResult<ts.Node> {
+        // if (ts.isBlock(node)) {
+        //     const awaitExpr = factory.createAwaitExpression(factory.createNumericLiteral(0));
+        //     return factory.updateBlock(node, [
+        //         factory.createExpressionStatement(awaitExpr),
+        //         ...node.statements
+        //     ]);
+		// }
+		
+
+		// Swap Identifiers
+        if (ts.isIdentifier(node) && ts.idText(node) === "sort") {
+            const replacement = factory.createIdentifier("reverse");
+            ts.setSourceMapRange(replacement, node);
+            return replacement;
+        }
+
+        return ts.visitEachChild(node, visitor, context);
+    }
+
+	function visitSourceFile(file: ts.SourceFile): ts.SourceFile {
+		// start custom ts to ts transformation
+
+		// hmm.. inserting the debugger statement directly brings to compiled JavaScript
+
+		// const newFile = factory.updateSourceFile(file, [factory.createDebuggerStatement(), ...file.statements]);
+		// return ts.visitEachChild(newFile, visitor, context);
+
+		// Manipulate and insert anything that is needed at the beginning of the file
+		const newFile = factory.updateSourceFile(file, [createConsoleLog(), ...file.statements]);
+		return ts.visitEachChild(newFile, visitor, context);
+	}
+
+
+
+    return visitSourceFile;
 }
