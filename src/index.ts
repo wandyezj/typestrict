@@ -1,43 +1,7 @@
-import * as ts from "typescript";
-import { getSourceFileNode } from "./getSourceFileNode";
-import { Rules } from "./rules/Rules";
-import { visitNodesAndCallback } from "./visitNodesAndCallback";
+import { Rules } from "./Rules";
 import {Issue} from  "./Issue";
+import {syntaxKindDefault} from "./syntaxKindDefault";
 // import {createProgram} from "./createProgram";
-
-const syntaxKindDefault = [
-    ts.SyntaxKind.SourceFile,
-    ts.SyntaxKind.FirstStatement,
-    ts.SyntaxKind.VariableDeclarationList,
-    ts.SyntaxKind.VariableDeclaration,
-    ts.SyntaxKind.Identifier,
-    ts.SyntaxKind.FirstLiteralToken,
-    ts.SyntaxKind.EndOfFileToken,
-    ts.SyntaxKind.StringLiteral,
-    ts.SyntaxKind.ForStatement,
-    ts.SyntaxKind.BinaryExpression,
-    ts.SyntaxKind.FirstBinaryOperator,
-    ts.SyntaxKind.PostfixUnaryExpression,
-    ts.SyntaxKind.Block,
-    ts.SyntaxKind.WhileStatement,
-    ts.SyntaxKind.TrueKeyword,
-    ts.SyntaxKind.IfStatement,
-    ts.SyntaxKind.FalseKeyword,
-    ts.SyntaxKind.FunctionDeclaration,
-    ts.SyntaxKind.ArrayLiteralExpression,
-    ts.SyntaxKind.ForOfStatement,
-    ts.SyntaxKind.ForInStatement,
-    ts.SyntaxKind.ObjectLiteralExpression,
-    ts.SyntaxKind.PropertyAssignment,
-    ts.SyntaxKind.ArrowFunction,
-    ts.SyntaxKind.Parameter,
-    ts.SyntaxKind.NumberKeyword,
-    ts.SyntaxKind.EqualsGreaterThanToken,
-    ts.SyntaxKind.PlusToken,
-    ts.SyntaxKind.ExpressionStatement,
-    ts.SyntaxKind.CallExpression,
-    ts.SyntaxKind.PropertyAccessExpression,
-];
 
 export interface CheckOptions {
         rules?: Partial<{
@@ -47,7 +11,6 @@ export interface CheckOptions {
             functionDeclaration:{};
         }>
 }
-
 
 export function getIssues(
     code: string,
@@ -61,7 +24,7 @@ export function getIssues(
     }
 ): Issue[] {
     // console.log(code);
-    const rules = new Rules();
+    const rules = new Rules(code);
 
     const {
         syntaxKind,
@@ -105,44 +68,7 @@ export function getIssues(
         rules.addRuleFunctionDeclaration();
     }
 
-    // if acting on a single source file then external symbols cannot be resolved
-    // const program = createProgram("file", code);
-    // const sourceFile =  program.getSourceFile("file");
-    // if (!sourceFile) {
-    //     return [];
-    // }
-    const sourceFile = getSourceFileNode(code);
-
-    visitNodesAndCallback(sourceFile, (node: ts.Node) => {
-        rules.run(node);
-    });
-
-     // print all the messages
-    // rules.errors.forEach((error) => {
-    //     console.log(error);
-    // });
-
-    const issues = rules.results.map((result) => {
-        const {code, message, node} = result;
-
-        const {pos, end} = node;
-
-        const open = sourceFile.getLineAndCharacterOfPosition(pos);
-        const close = sourceFile.getLineAndCharacterOfPosition(end);
-
-        const issue: Issue = {
-            code: code || "?",
-            message,
-            pos,
-            end,
-            startLineNumber: open.line,
-            endLineNumber: close.line,
-            startColumn: open.character,
-            endColumn: close.character,
-        };
-
-        return issue;
-    });
+    const issues = rules.run();
 
     return issues;
 }
@@ -152,8 +78,6 @@ export function checkTs(
     options: CheckOptions = {}
 ): boolean {
 
-
- 
     const issues = getIssues(code, options);
     return issues.length === 0;
 }
