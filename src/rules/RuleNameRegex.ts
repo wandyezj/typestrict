@@ -6,8 +6,8 @@ export class RuleNameRegex implements Rule {
     readonly functionName: RegExp | undefined;
     readonly variableName: RegExp | undefined;
 
-    constructor(options: {functionName?: RegExp, variableName?: RegExp}) {
-        const {functionName, variableName} = options;
+    constructor(options: { functionName?: RegExp; variableName?: RegExp }) {
+        const { functionName, variableName } = options;
         this.functionName = functionName;
         this.variableName = variableName;
     }
@@ -20,7 +20,7 @@ export class RuleNameRegex implements Rule {
         const result: RuleResult[] = [];
 
         if (this.functionName && ts.isFunctionDeclaration(node)) {
-            const {name} = node as ts.FunctionDeclaration;
+            const { name } = node as ts.FunctionDeclaration;
             const pass = testIdentifier(name, this.functionName);
             if (!pass) {
                 result.push({
@@ -29,14 +29,16 @@ export class RuleNameRegex implements Rule {
                 });
             }
         } else if (this.variableName && ts.isVariableStatement(node)) {
-
-            const {declarationList} = node as ts.VariableStatement;
+            const { declarationList } = node as ts.VariableStatement;
             declarationList.forEachChild((node: ts.Node) => {
                 if (ts.isVariableDeclaration(node)) {
                     const variable = node as ts.VariableDeclaration;
                     const identifier = variable.name;
                     if (ts.isIdentifier(identifier)) {
-                        const pass = testIdentifier(identifier, this.variableName);
+                        const pass = testIdentifier(
+                            identifier,
+                            this.variableName
+                        );
                         if (!pass) {
                             result.push({
                                 node,
@@ -52,7 +54,13 @@ export class RuleNameRegex implements Rule {
     }
 }
 
-function testIdentifier(identifier: ts.Identifier | undefined, regex: RegExp | undefined): boolean {
-    const pass = identifier !== undefined && regex !== undefined && regex.test(identifier.text);
+function testIdentifier(
+    identifier: ts.Identifier | undefined,
+    regex: RegExp | undefined
+): boolean {
+    const pass =
+        identifier !== undefined &&
+        regex !== undefined &&
+        regex.test(identifier.text);
     return pass;
 }

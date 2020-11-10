@@ -10,9 +10,8 @@ export function createProgram(
 
     // options
     const compilerOptions: ts.CompilerOptions = {
-        target: ts.ScriptTarget.ES5,
+        target: ts.ScriptTarget.ESNext,
         sourceMap: true,
-        
     };
 
     // sourceFile and host

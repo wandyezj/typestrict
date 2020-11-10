@@ -1,15 +1,16 @@
 import { Rules } from "./Rules";
-import {Issue} from  "./Issue";
-import {syntaxKindDefault} from "./syntaxKindDefault";
+import { Issue } from "./Issue";
+import { syntaxKindDefault } from "./syntaxKindDefault";
 // import {createProgram} from "./createProgram";
 
 export interface CheckOptions {
-        rules?: Partial<{
-            syntaxKind: {};
-            blockRequired: {};
-            nameRegex:{};
-            functionDeclaration:{};
-        }>
+    rules?: Partial<{
+        syntaxKind: {};
+        blockRequired: {};
+        nameRegex: {};
+        functionDeclaration: {};
+        callbacksAreArrowFunctions: {};
+    }>;
 }
 
 export function getIssues(
@@ -18,20 +19,17 @@ export function getIssues(
         rules: {
             syntaxKind: {},
             blockRequired: {},
-            nameRegex:{},
-            functionDeclaration:{},
-        }
+            nameRegex: {},
+            functionDeclaration: {},
+            callbacksAreArrowFunctions: {},
+        },
     }
 ): Issue[] {
     // console.log(code);
     const rules = new Rules(code);
 
-    const {
-        syntaxKind,
-        blockRequired,
-        nameRegex,
-        functionDeclaration
-    } = options.rules || {};
+    const { syntaxKind, blockRequired, nameRegex, functionDeclaration } =
+        options.rules || {};
 
     const enableSyntaxKind = syntaxKind !== undefined;
     if (enableSyntaxKind) {
@@ -73,30 +71,34 @@ export function getIssues(
     return issues;
 }
 
-export function checkTs(
-    code: string,
-    options: CheckOptions = {}
-): boolean {
-
+export function checkTs(code: string, options: CheckOptions = {}): boolean {
     const issues = getIssues(code, options);
     return issues.length === 0;
 }
 
-
-
 function test() {
-const program = `
-function f(){function f(){}}
-`;
-const pass = checkTs(program, {
-    rules: {
-        blockRequired: {},
-        syntaxKind: {},
-        nameRegex:{},
-        functionDeclaration:{},
-    },
-});
+    const program = `
+f(()=>{})
 
-console.log(pass);
+f(c)
+
+
+function f(callback: ()=> void) {
+}
+
+function c()  {
+}
+`;
+    const pass = checkTs(program, {
+        rules: {
+            // blockRequired: {},
+            // syntaxKind: {},
+            // nameRegex:{},
+            // functionDeclaration:{},
+            callbacksAreArrowFunctions: {},
+        },
+    });
+
+    console.log(pass);
 }
 test();

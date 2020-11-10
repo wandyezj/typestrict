@@ -25,11 +25,11 @@ export class RuleFunctionDeclaration implements Rule {
                     const declaration = statement as ts.FunctionDeclaration;
 
                     // any additional declarations inside of this function need to be marked
-                    visitNodesAndCallback(declaration.body, (node: ts.Node)=> {
+                    visitNodesAndCallback(declaration.body, (node: ts.Node) => {
                         if (ts.isFunctionDeclaration(node)) {
                             result.push({
                                 node,
-                                message: `${this.name} All functions must be declared at the top level`
+                                message: `${this.name} All functions must be declared at the top level`,
                             });
                         }
                     });

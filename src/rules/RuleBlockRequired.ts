@@ -15,25 +15,24 @@ export class RuleBlockRequired implements Rule {
         if (ts.isIfStatement(node)) {
             const { thenStatement, elseStatement } = node as ts.IfStatement;
             const thenIsBlock = ts.isBlock(thenStatement);
-            const elseIsOk = 
-            elseStatement === undefined 
-            || ts.isBlock(elseStatement) 
-            || ts.isIfStatement(elseStatement);
+            const elseIsOk =
+                elseStatement === undefined ||
+                ts.isBlock(elseStatement) ||
+                ts.isIfStatement(elseStatement);
 
             if (!thenIsBlock) {
                 result.push({
                     node,
-                    message: `${this.name} If Statements must have blocks`
+                    message: `${this.name} If Statements must have blocks`,
                 });
             }
 
             if (!elseIsOk) {
                 result.push({
                     node: elseStatement || node,
-                    message: `${this.name} Else Statements must have blocks`
+                    message: `${this.name} Else Statements must have blocks`,
                 });
             }
-
         } else if (
             ts.isForStatement(node) ||
             ts.isForInStatement(node) ||
@@ -50,7 +49,7 @@ export class RuleBlockRequired implements Rule {
             if (!hasBlock) {
                 result.push({
                     node: node,
-                    message: `${this.name} Loops must have blocks`
+                    message: `${this.name} Loops must have blocks`,
                 });
             }
         }

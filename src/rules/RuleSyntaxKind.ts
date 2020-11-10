@@ -12,10 +12,16 @@ export class RuleSyntaxKind implements Rule {
     run(node: ts.Node): RuleResult[] {
         const pass = this.kinds.has(node.kind);
 
-        const result: RuleResult[] = pass? [] :[{
-            node,
-            message: `${this.name} Unsupported SyntaxKind ${ts.SyntaxKind[node.kind]}`,
-        }];
+        const result: RuleResult[] = pass
+            ? []
+            : [
+                  {
+                      node,
+                      message: `${this.name} Unsupported SyntaxKind ${
+                          ts.SyntaxKind[node.kind]
+                      }`,
+                  },
+              ];
 
         return result;
     }

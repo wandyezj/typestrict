@@ -2,12 +2,14 @@ import ts from "typescript";
 import { Rule } from "./rules/Rule";
 import { RuleBlockRequired } from "./rules/RuleBlockRequired";
 import { RuleSyntaxKind } from "./rules/RuleSyntaxKind";
-import {RuleResult} from "./rules/RuleResult";
+import { RuleResult } from "./rules/RuleResult";
 import { RuleNameRegex } from "./rules/RuleNameRegex";
 import { RuleFunctionDeclaration } from "./rules/RuleFunctionDeclaration";
-import {Issue} from "./Issue";
-import { getSourceFileNode } from "./getSourceFileNode";
+import { Issue } from "./Issue";
+// import { getSourceFileNode } from "./getSourceFileNode";
 import { visitNodesAndCallback } from "./visitNodesAndCallback";
+import { createProgram } from "./createProgram";
+import { RuleCallbacksAreArrowFunctions } from "./rules/RuleCallbacksAreArrowFunctions";
 /**
  * contains all of the rules that are registered to run
  */
@@ -24,8 +26,14 @@ export class Rules {
         return this.errors.length === 0;
     }
 
-    constructor(private code: string) {
-
+    private codeFileName = "code.ts";
+    private program: ts.Program;
+    private typeChecker: ts.TypeChecker;
+    private sourceFile: ts.SourceFile | undefined;
+    constructor(code: string) {
+        this.program = createProgram(this.codeFileName, code);
+        this.sourceFile = this.program.getSourceFile(this.codeFileName);
+        this.typeChecker = this.program.getTypeChecker();
     }
 
     private addRule(rule: Rule) {
@@ -42,7 +50,7 @@ export class Rules {
         this.addRule(rule);
     }
 
-    addRuleNameRegex(options: {functionName: RegExp, variableName: RegExp}) {
+    addRuleNameRegex(options: { functionName: RegExp; variableName: RegExp }) {
         const rule = new RuleNameRegex(options);
         this.addRule(rule);
     }
@@ -52,15 +60,24 @@ export class Rules {
         this.addRule(rule);
     }
 
+    addRuleCallbacksAreArrowFunctions() {
+        const rule = new RuleCallbacksAreArrowFunctions();
+        this.addRule(rule);
+    }
+
     run(): Issue[] {
-            
         // if acting on a single source file then external symbols cannot be resolved
         // const program = createProgram("file", code);
         // const sourceFile =  program.getSourceFile("file");
         // if (!sourceFile) {
         //     return [];
         // }
-        const sourceFile = getSourceFileNode(this.code);
+        if (!this.sourceFile) {
+            throw "Source File not defined";
+        }
+
+        const sourceFile = this.sourceFile;
+        //getSourceFileNode(this.code);
 
         visitNodesAndCallback(sourceFile, (node: ts.Node) => {
             this.runRules(node);
@@ -72,9 +89,9 @@ export class Rules {
         // });
 
         const issues = this.results.map((result) => {
-            const {code, message, node} = result;
+            const { code, message, node } = result;
 
-            const {pos, end} = node;
+            const { pos, end } = node;
 
             const open = sourceFile.getLineAndCharacterOfPosition(pos);
             const close = sourceFile.getLineAndCharacterOfPosition(end);
@@ -92,31 +109,35 @@ export class Rules {
 
             return issue;
         });
-        return issues
+        return issues;
     }
 
     // run for every node individually
     // really this needs to be broken up inside into two versions
     // one version for each individual node
     // one version for holistic linters that need access to the entire AST tree
-    private runRules(node: ts.Node) : RuleResult[]{
+    private runRules(node: ts.Node): RuleResult[] {
         // want to know for each node which rules failed and why
         // run all the rule on the node
 
-        const results = this.rules.map((rule) =>  rule.run(node))
-        .filter((results) => results.length > 0)
-        //.flat(1);
-        .reduce((acc, val) => acc.concat(val), []);
-        
+        const results = this.rules
+            .map((rule) => rule.run(node, { typeChecker: this.typeChecker }))
+            .filter((results) => results.length > 0)
+            //.flat(1);
+            .reduce((acc, val) => acc.concat(val), []);
+
         // this.results.push(...results);
-        results.forEach(result => {
-            this.results.push(result)
+        results.forEach((result) => {
+            this.results.push(result);
         });
-        
-        const formatNode = (node: ts.Node) => `node: [${node.pos}, ${node.end}] ${node.getText()}`;
-        const messages = results.map((result) => `${formatNode(node)}\n\t\t${result.message}`);
+
+        const formatNode = (node: ts.Node) =>
+            `node: [${node.pos}, ${node.end}] ${node.getText()}`;
+        const messages = results.map(
+            (result) => `${formatNode(node)}\n\t\t${result.message}`
+        );
         const message = `${formatNode(node)}\n\t${messages.join("\n\t")}`;
-        
+
         //this.errors.push(...message);
         this.errors.push(message);
 
